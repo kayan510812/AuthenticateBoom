@@ -3,9 +3,11 @@
 namespace Database\Factories;
 
 use App\Models\User;
+use App\Services\TwoFactorAuthenticator;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use PragmaRX\Google2FA\Google2FA;
 
 /**
  * @extends Factory<User>
@@ -40,6 +42,31 @@ class UserFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'email_verified_at' => null,
+        ]);
+    }
+
+    /**
+     * A user that finished the two factor enrollment.
+     */
+    public function withTwoFactor(?string $secret = null): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'two_factor_secret' => $secret ?? app(Google2FA::class)->generateSecretKey(32),
+            'two_factor_recovery_codes' => app(TwoFactorAuthenticator::class)->generateRecoveryCodes(),
+            'two_factor_confirmed_at' => now(),
+        ]);
+    }
+
+    /**
+     * A user that signed up through GitHub and has no local password.
+     */
+    public function github(string $githubId = '1001'): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'password' => null,
+            'github_id' => $githubId,
+            'github_nickname' => 'octocat',
+            'avatar_url' => 'https://avatars.githubusercontent.com/u/1?v=4',
         ]);
     }
 }
