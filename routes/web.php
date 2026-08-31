@@ -1,7 +1,8 @@
 <?php
 
-use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Auth\Concerns\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\GithubOAuthController;
+use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\TwoFactorChallengeController;
 use App\Http\Controllers\Auth\TwoFactorSettingsController;
@@ -24,6 +25,10 @@ Route::middleware('guest')->group(function () {
     // GitHub OAuth
     Route::get('auth/github/redirect', [GithubOAuthController::class, 'redirect'])->name('github.redirect');
     Route::get('auth/github/callback', [GithubOAuthController::class, 'callback'])->name('github.callback');
+
+    // Google OAuth
+    Route::get('auth/google/redirect', [GoogleAuthController::class, 'redirect'])->name('google.redirect');
+    Route::get('auth/google/callback', [GoogleAuthController::class, 'callback'])->name('google.callback');
 
     // Second factor, still unauthenticated: only a pending user id in the session.
     Route::get('two-factor-challenge', [TwoFactorChallengeController::class, 'create'])->name('two-factor.challenge');

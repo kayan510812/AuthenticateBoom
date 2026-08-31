@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Keeps GitHub users out of the application until they enrolled in two factor
+ * Keeps OAuth users out of the application until they enrolled in two factor
  * authentication, when MFA_ENFORCE_FOR_OAUTH is on.
  */
 class RequireTwoFactorEnrollment
@@ -18,11 +18,11 @@ class RequireTwoFactorEnrollment
 
         if ($user
             && config('mfa.enforce_for_oauth')
-            && $user->github_id
+            && ($user->github_id || $user->google_id)
             && ! $user->hasTwoFactorEnabled()) {
             return redirect()->route('two-factor.setup')->with(
                 'status',
-                'Two factor authentication is required for GitHub accounts. Finish the setup to continue.'
+                'Two factor authentication is required for GitHub and Google accounts. Finish the setup to continue.'
             );
         }
 

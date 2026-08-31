@@ -69,4 +69,17 @@ class UserFactory extends Factory
             'avatar_url' => 'https://avatars.githubusercontent.com/u/1?v=4',
         ]);
     }
+
+    /**
+     * A user that signed up through Google and has no local password.
+     */
+    public function google(string $googleId = '2001'): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'password' => null,
+            'google_id' => $googleId,
+            'google_nickname' => null,
+            'avatar_url' => 'https://lh3.googleusercontent.com/a/default-user',
+        ]);
+    }
 }

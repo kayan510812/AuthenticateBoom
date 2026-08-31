@@ -153,10 +153,11 @@ class TwoFactorSettingsController extends Controller
     }
 
     /**
-     * GitHub accounts must keep two factor on when enforcement is enabled.
+     * OAuth accounts must keep two factor on when enforcement is enabled.
      */
     private function isRequired($user): bool
     {
-        return config('mfa.enforce_for_oauth') && ! is_null($user->github_id);
+        return config('mfa.enforce_for_oauth')
+            && (! is_null($user->github_id) || ! is_null($user->google_id));
     }
 }
