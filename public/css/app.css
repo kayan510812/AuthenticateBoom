@@ -110,8 +110,13 @@ input:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-colo
 .btn.danger:hover { background: #2a1720; }
 .btn.github { background: #1f2430; border: 1px solid var(--border); color: var(--text); }
 .btn.github:hover { background: #262d3d; }
+.btn.google { background: #1f2430; border: 1px solid var(--border); color: var(--text); }
+.btn.google:hover { background: #262d3d; }
 .btn.link { background: none; border: none; color: var(--muted); width: auto; padding: 0; font-weight: 500; }
 .btn.link:hover { color: var(--text); text-decoration: underline; }
+
+/* Stacked provider buttons; .btn is 100% wide so they need a flex column. */
+.oauth { display: flex; flex-direction: column; gap: 10px; }
 
 .divider {
     display: flex;

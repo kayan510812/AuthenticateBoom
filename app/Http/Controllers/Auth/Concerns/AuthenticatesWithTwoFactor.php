@@ -45,13 +45,14 @@ trait AuthenticatesWithTwoFactor
     }
 
     /**
-     * Where a fully authenticated user lands.
+     * Where a fully authenticated user lands. OAuth sign ins are pushed into
+     * the enrollment screen first when MFA_ENFORCE_FOR_OAUTH is on.
      */
     protected function redirectAfterLogin(Request $request, string $via = 'password'): RedirectResponse
     {
         $user = $request->user();
 
-        if ($via === 'github' && config('mfa.enforce_for_oauth') && $user && ! $user->hasTwoFactorEnabled()) {
+        if (in_array($via, ['github', 'google'], true) && config('mfa.enforce_for_oauth') && $user && ! $user->hasTwoFactorEnabled()) {
             return redirect()->route('two-factor.setup')
                 ->with('status', 'Set up two factor authentication to finish securing your account.');
         }

@@ -125,4 +125,14 @@ class TwoFactorSetupTest extends TestCase
 
         $this->assertTrue($user->fresh()->hasTwoFactorEnabled());
     }
+
+    public function test_a_google_account_cannot_disable_two_factor_while_enforcement_is_on(): void
+    {
+        config(['mfa.enforce_for_oauth' => true]);
+        $user = User::factory()->google()->withTwoFactor()->create();
+
+        $this->actingAs($user)->delete('/two-factor')->assertSessionHasErrors('password');
+
+        $this->assertTrue($user->fresh()->hasTwoFactorEnabled());
+    }
 }
