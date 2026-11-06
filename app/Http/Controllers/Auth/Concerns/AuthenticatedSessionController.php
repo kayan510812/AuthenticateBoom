@@ -38,7 +38,7 @@ class AuthenticatedSessionController extends Controller
 
             throw ValidationException::withMessages([
                 'email' => $user && ! $user->hasPassword()
-                    ? 'This account was created with GitHub. Sign in with GitHub instead.'
+                    ? $this->oauthOnlyMessage($user)
                     : trans('auth.failed'),
             ]);
         }
@@ -56,6 +56,13 @@ class AuthenticatedSessionController extends Controller
         $request->session()->regenerateToken();
 
         return redirect()->route('login')->with('status', 'You have been signed out.');
+    }
+
+    private function oauthOnlyMessage(User $user): string
+    {
+        $provider = $user->github_id ? 'GitHub' : ($user->google_id ? 'Google' : 'GitHub');
+
+        return "This account was created with {$provider}. Sign in with {$provider} instead.";
     }
 
     private function ensureIsNotRateLimited(Request $request): void
