@@ -64,6 +64,39 @@ class TwoFactorSetupTest extends TestCase
         $this->assertNull(session('two_factor.pending_secret'));
     }
 
+    public function test_restarting_setup_replaces_the_pending_secret(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)->get('/two-factor');
+        $old = session('two_factor.pending_secret');
+
+        $this->actingAs($user)->post('/two-factor/reset')->assertRedirect('/two-factor');
+
+        $this->actingAs($user)->get('/two-factor');
+        $new = session('two_factor.pending_secret');
+
+        $this->assertNotEmpty($new);
+        $this->assertNotSame($old, $new);
+    }
+
+    public function test_a_code_from_the_old_secret_is_rejected_after_restarting_setup(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)->get('/two-factor');
+        $old = session('two_factor.pending_secret');
+
+        $this->actingAs($user)->post('/two-factor/reset');
+        $this->actingAs($user)->get('/two-factor');
+
+        $this->actingAs($user)->post('/two-factor', [
+            'code' => app(Google2FA::class)->getCurrentOtp($old),
+        ])->assertSessionHasErrors('code');
+
+        $this->assertFalse($user->fresh()->hasTwoFactorEnabled());
+    }
+
     public function test_an_invalid_code_does_not_enable_two_factor(): void
     {
         $user = User::factory()->create();
